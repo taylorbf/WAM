@@ -199,5 +199,49 @@ Modules = {
 				y: 0
 			}
 		}
-	]}
+	]},
+	"delay": { 
+		size: {
+			w: 80,
+			h: 52
+		},
+		audio: function() {
+			this.delayline = new Tone.FeedbackDelay(0.25, 0.8)
+			this.delayline.connect(this.output)
+			this.input.connect(this.delayline)
+		},
+		interface: [
+		{
+			type: "dial",
+			label: "fb",
+			action: function(data) {
+				this.delayline.feedback.value = data.value
+			},
+			size: {
+				w: 40,
+				h: 40
+			},
+			loc: {
+				x: 0,
+				y: 0
+			}
+		},
+		{
+			type: "dial",
+			label: "time",
+			action: function(data) {
+				this.delayline.delayTime.value = data.value + 0.01
+			},
+			size: {
+				w: 40,
+				h: 40
+			},
+			init: function() {
+			},
+			loc: {
+				x: 40,
+				y: 0
+			}
+		}
+	]}, 
 }
