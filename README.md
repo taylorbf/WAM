@@ -5,15 +5,19 @@
 
 **WAM** is a collection of modular computer music components –– each including an audio engine & GUI –– built by web audio community members.
 
-WAM is designed to assist building expressive browser instruments.
+WAM is designed to assist building expressive musical instruments in the browser.
 
-#### Adding Modules
 
-Modules are designed in JSON format within WAM.js. 
+### Using Modules
+
+Modules can be connected together via stereo routing. The API for using modules is in construction.
+
+
+### Adding Modules
 
 **All users are encouraged to add modules to WAM. I am accepting all pull requests of working modules.** 
 
-The JSON for the sine oscillator module looks like this:
+Modules are designed in JSON format within WAM.js. The JSON for the sine oscillator module looks like this:
 
 ```
 Modules.sine = { 
@@ -60,8 +64,3 @@ Modules.sine = {
 	]
 }
 ```
-
-#### Using Modules
-
-Modules can be connected together via stereo routing. The API for using modules is in construction.
-
