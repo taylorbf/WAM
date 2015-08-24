@@ -20,7 +20,7 @@ WAM.setContext( ctx )
 
 
 
-#### Invoking Individual Modules
+#### Adding Individual Modules
 
 Individual modules can be added to your project using **WAM.*moduleName*()** and connected to each other (or to any web audio node) using `.connect()`
 
@@ -31,11 +31,11 @@ mySine.connect(myDelay)
 myDelay.connect( WAM.out() )
 ```
 
-By default, modules are positioned on the page relative to each other, within the flow of the document. To place a module precisely on the page, specify x/y when creating the module. `WAM.sine(100,200)` will create a module 100 px from the left and 200 px from the top of the document.
+By default, modules are positioned on the page relative to each other, within the flow of the document. To place a module precisely on the page, specify x/y when creating the module. Example: `WAM.sine(100,200)` will create a module 100 px from the left and 200 px from the top of the document.
 
 #### Chaining Modules (recommended)
 
-Groups of modules can be created and chained using `WAM.route()`. This way you don't need to `.connect()` every module.
+Groups of modules can be both created *and* connected using `WAM.route()`. This way you don't need to `.connect()` every module.
 
 ```js
 var rack1 = WAM.route([
@@ -45,11 +45,11 @@ var rack1 = WAM.route([
 ])
 ```
 
-Creates the audiograph:
+...creates the audiograph:
 
 ![AudioGraph](images/graph1.png)
 
-More complex audiographs can be created using WAM.join()
+More complex audiographs can be created using `WAM.join()` along with `WAM.route()`:
 
 ```js
 var rack1 = WAM.route([
@@ -77,7 +77,7 @@ var rack1 = WAM.route([
 
 ![AudioGraph](images/graph3.png)
 
-You can also connect routes together.
+You can also connect groups:
 
 ```js
 var rack1 = WAM.route([
@@ -102,11 +102,11 @@ rack2.connect(rack3)
 
 ## Contributing Modules
 
-**All users are encouraged to add modules to WAM. I am accepting all pull requests of working modules.** 
+**All users are encouraged to add modules to WAM! I am accepting all pull requests of working modules. These can be audio effects, signal generators, granular synths... the sky's the limit.** 
 
 Modules are written as JS object literals within WAM.js. Each object follows the same pattern of properties and methods.
 
-The sine oscillator module looks like this:
+##### Example Module: "Sine" (sine oscillator with frequency and volume controls)
 
 ```js
 Modules.sine = { 
@@ -154,9 +154,44 @@ Modules.sine = {
 }
 ```
 
+##### But what does it all mean?
+
+The core of a module is:
+
+- A bit of web audio code (held in the `audio` function) which is executed once when the module loads.
+- A list of NexusUI interface components which have actions that affect the audio code depending on data from the interface. Interface actions are executed whenever the interface is interacted with.
+
+This is the same "sine" module with all size and location details removed. It should show a clearer picture of the module's core components.
+
+```js
+Modules.sine = { 
+	audio: function() {
+		this.toneosc = new Tone.Oscillator(440, "sine").start();
+		this.toneosc.connect(this.output)
+	},
+	interface: [
+		{
+			type: "dial",
+			label: "freq",
+			action: function(data) {
+				this.toneosc.frequency.value = data.value * 1000
+			}
+		},
+		{
+			type: "dial",
+			label: "vol",
+			action: function(data) {
+				this.toneosc.volume.value = -100 + data.value*100
+			}
+		}
+	]
+}
+```
+
+
 ## Anatomy of a Module
 
-Each module has the following properties, which may be useful:
+Each module also has the following built-in properties, which may be useful during development:
 
 ##### this.input
 
@@ -164,7 +199,7 @@ Gain node forming the audio input to the current module. This is connected to by
 
 ##### this.output
 
-Gain node forming the audio output of the current module. This connects to ther modules.
+Gain node forming the audio output of the current module. This connects to other modules.
 
 ##### this.shell
 
