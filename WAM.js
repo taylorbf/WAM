@@ -32,6 +32,13 @@ Wam.prototype.route = function(path) {
 	var ports = {
 		input: path[0].input,
 		output: path[path.length-1].output
+		connect: function(out,destination) {
+			if (destination.input) {
+				out.connect(destination.input)
+			} else {
+				out.connect(destination)
+			}
+		}.bind(this,path[path.length-1].output)
 	}
 	return ports
 }

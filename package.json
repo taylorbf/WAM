@@ -1,0 +1,12 @@
+{
+  "name": "wam",
+  "description": "Web Audio Modules",
+  "author": "Ben Taylor <taylorbf@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/taylorbf/WAM/"
+  },
+  "engine": "node >= 0.10.0",
+  "version": "0.0.1",
+  "license": "New BSD License"
+}
