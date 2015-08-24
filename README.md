@@ -3,7 +3,9 @@
 ![Demo Image](images/demo.png)
 <br>*A sine oscillator module connected to a delay module*
 
-**WAM** is a collection of open-source modular computer music components –– each including a web audio engine & HTML5 GUI –– built by the web audio community.
+**WAM** is a collection of open-source modular computer music components built by the web audio community.
+
+Each module includes a web audio engine & HTML5 GUI.
 
 WAM is designed to assist building expressive musical instruments in the browser.
 
@@ -12,7 +14,7 @@ WAM is designed to assist building expressive musical instruments in the browser
 
 #### Assigning Context
 
-Given a context *ctx*:
+Tell WAM about your current audio context: 
 
 ```js
 WAM.setContext( ctx )
