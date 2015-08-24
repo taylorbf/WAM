@@ -12,14 +12,32 @@ WAM is designed to assist building expressive musical instruments in the browser
 
 Modules can be connected together via stereo routing. The API for using modules is in construction.
 
+Currently:
 
-### Adding Modules
+```js
+var sineosc = WAM.make("sine")
+```
+but moving towards an API that encourages chaining modules, possibly:
+
+```js
+var rack1 = WAM.make([
+	"sine",
+	"delay",
+	"phasor",
+	"reverb",
+	"out"
+])
+```
+
+
+
+### Contributing Modules
 
 **All users are encouraged to add modules to WAM. I am accepting all pull requests of working modules.** 
 
 Modules are designed in JSON format within WAM.js. The JSON for the sine oscillator module looks like this:
 
-```
+```js
 Modules.sine = { 
 	dependencies: [ "Tone" ],
 	size: {
