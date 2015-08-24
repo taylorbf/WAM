@@ -4,6 +4,10 @@ var Wam = function() {
 	this.context;
 	this.modules = []
 
+	nx.onload = function() {
+		nx.colorize("black")
+	}
+
 }
 
 
@@ -37,6 +41,7 @@ Wam.prototype.rack = function (type) {
 	this.shell.style.display = "inline-block"
 	this.shell.style.fontSize = "10px"
 	this.shell.style.fontFamily = "helvetica neue"
+	this.shell.style.margin = "-1px 0px 0px -1px"
 
 	parent.appendChild(this.shell)
 
@@ -71,8 +76,17 @@ Wam.prototype.rack = function (type) {
 
 	module.audio.bind(this)()
 
-	/* create interface */
+	/* create custom module api */
 
+	if (module.custom) {
+		for (var key in module.custom) {
+			console.log(key)
+			this[key] = module.custom[key].bind(this)
+			console.log(this)
+		}
+	}
+
+	/* create interface */
 
 	for (var i=0;i<parts.length;i++) {
 
@@ -109,12 +123,12 @@ Wam.prototype.rack = function (type) {
 			label.style.textAlign = "center"
 			label.style.backgroundColor = "#eee"
 			label.style.border = "solid 1px white"
+
+			col.appendChild(label)
 		}
 
-		col.appendChild(label)
-
 		if (parts[i].init) {
-			parts[i].init.bind(this,widget)();
+			parts[i].init.bind(widget)();
 		}
 
 		this.components.push(widget)
@@ -158,6 +172,7 @@ var WAM = new Wam();
 
 Modules = {
 	"sine": { 
+		dependencies: [ "Tone" ],
 		size: {
 			w: 80,
 			h: 52
@@ -192,8 +207,6 @@ Modules = {
 				w: 40,
 				h: 40
 			},
-			init: function() {
-			},
 			loc: {
 				x: 40,
 				y: 0
@@ -201,6 +214,7 @@ Modules = {
 		}
 	]},
 	"delay": { 
+		dependencies: [ "Tone" ],
 		size: {
 			w: 80,
 			h: 52
@@ -209,6 +223,7 @@ Modules = {
 			this.delayline = new Tone.FeedbackDelay(0.25, 0.8)
 			this.delayline.connect(this.output)
 			this.input.connect(this.delayline)
+			this.input.connect(this.output)
 		},
 		interface: [
 		{
@@ -241,6 +256,84 @@ Modules = {
 			loc: {
 				x: 40,
 				y: 0
+			}
+		}
+	]}, 
+	"bt-looper": { 
+		dependencies: [ "Tone" ],
+		size: {
+			w: 200,
+			h: 120
+		},
+		audio: function() {
+			this.player = new Tone.Player()
+			this.player.loop = true
+			this.player.connect(this.output)
+		},
+		custom: {
+			"setFiles": function(list) {
+				this.components[1].choices = [];
+				this.components[1].init()
+				this.components[1].choices = list;
+				this.components[1].init()
+			}
+		},
+		interface: [
+		{
+			type: "toggle",
+			label: "on",
+			action: function(data) {
+				if (data.value) {
+					this.player.start()
+				} else {
+					this.player.stop()
+				}
+			},
+			size: {
+				w: 20,
+				h: 20
+			},
+			loc: {
+				x: 0,
+				y: 0
+			}
+		},
+		{
+			type: "select",
+			label: "file",
+			action: function(data) {
+				if (data.text) {
+					this.player.load("./audio/"+data.text,function() {
+						this.components[2].setBuffer( this.player._buffer._buffer )
+					}.bind(this))
+				}
+			},
+			size: {
+				w: 174,
+				h: 20
+			},
+			loc: {
+				x: 25,
+				y: 0
+			},
+			init: function() {
+			}
+		},
+		{
+			type: "waveform",
+			label: "loop",
+			action: function(data) {
+				this.player.setLoopPoints(data.starttime/1000, data.stoptime/1000)
+			},
+			size: {
+				w: 200,
+				h: 70
+			},
+			init: function() {
+			},
+			loc: {
+				x: 0,
+				y: 37
 			}
 		}
 	]}, 
