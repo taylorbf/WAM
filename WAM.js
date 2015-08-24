@@ -399,7 +399,7 @@ Modules = {
 	"meter": {
 		size: {
 			w: 20,
-			h: 62
+			h: 52
 		},
 		audio: function() {
 			this.components[0].setup(WAM.context,this.input);
@@ -414,14 +414,56 @@ Modules = {
 			},
 			size: {
 				w: 20,
-				h: 50
+				h: 40
 			},
 			loc: {
 				x: 0,
 				y: 0
 			}
 		}
-	]}
+	]},
+	"enveloop": {
+		size: {
+			w: 130,
+			h: 52
+		},
+		audio: function() {
+			this.input.connect(this.output)
+			this.components[0].looping = true
+			this.components[0].start()
+		},
+		interface: [
+		{
+			type: "envelope",
+			label: "volume",
+			action: function(data) {
+				this.input.gain.value = data.amp
+			},
+			size: {
+				w: 90,
+				h: 40
+			},
+			loc: {
+				x: 0,
+				y: 0
+			}
+		},
+		{
+			type: "dial",
+			label: "dur",
+			action: function(data) {
+				this.components[0].duration = data.value * 3000 + 10
+			},
+			size: {
+				w: 40,
+				h: 40
+			},
+			loc: {
+				x: 90,
+				y: 0
+			}
+		}
+	]},
 }
 
 
