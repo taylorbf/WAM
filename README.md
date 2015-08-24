@@ -10,17 +10,17 @@ WAM is designed to assist building expressive musical instruments in the browser
 
 ## Assigning Context
 
-If using Tone:
+Given a context *ctx*:
 
 ```js
-WAM.setContext( Tone.Context )
+WAM.setContext( ctx )
 ```
 
-## Building an Instrument using WAM Modules
+## Building an Instrument
 
-#### Individually
+#### Invoking Individual Modules
 
-Individual modules can be created using **WAM.*moduleName*()** and connected using `.connect()`
+Individual modules can be added to your project using **WAM.*moduleName*()** and connected using `.connect()`
 
 ```js
 var mySine = WAM.sine()
@@ -29,7 +29,9 @@ mySine.connect(myDelay)
 myDelay.connect( WAM.out() )
 ```
 
-#### Chaining (recommended)
+By default, modules are positioned on the page relative to each other, within the flow of the document. To place a module precisely on the page, specify x/y when creating the module. `WAM.sine(100,200)` will create a module 100 px from the left and 200 px from the top of the document.
+
+#### Chaining Modules (recommended)
 
 Groups of modules can created and chained using `WAM.route()`. This way you don't need to `.connect()` every module.
 
@@ -134,3 +136,5 @@ Modules.sine = {
 	]
 }
 ```
+
+## Anatomy of a Module
