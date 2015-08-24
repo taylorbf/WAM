@@ -31,7 +31,7 @@ Wam.prototype.route = function(path) {
 	}
 	var ports = {
 		input: path[0].input,
-		output: path[path.length-1].output
+		output: path[path.length-1].output,
 		connect: function(out,destination) {
 			if (destination.input) {
 				out.connect(destination.input)
@@ -114,7 +114,8 @@ Wam.prototype.rack = function (type,x,y) {
 	title.style.left="0px"
 	title.style.width="100%"
 	title.style.backgroundColor="#eee"
-	title.style.padding="3px 10px"
+	title.style.padding="3px 0px"
+	title.style.overflow="hidden"
 	title.style.boxSizing="border-box"
 	title.style.textAlign="center"
 	title.innerHTML = type
@@ -133,10 +134,6 @@ Wam.prototype.rack = function (type,x,y) {
 
 	this.input = WAM.context.createGain()
 	this.output = WAM.context.createGain()
-
-	/* create audio */
-
-	module.audio.bind(this)()
 
 	/* create custom module api */
 
@@ -196,6 +193,10 @@ Wam.prototype.rack = function (type,x,y) {
 		this.components.push(widget)
 
 	}
+
+	/* create audio */
+
+	module.audio.bind(this)()
 
 	/*var closer = document.createElement("div")
 	closer.setAttribute("class", "closer")
@@ -392,6 +393,32 @@ Modules = {
 			loc: {
 				x: 0,
 				y: 37
+			}
+		}
+	]}, 
+	"meter": {
+		size: {
+			w: 20,
+			h: 62
+		},
+		audio: function() {
+			this.components[0].setup(WAM.context,this.input);
+			this.input.connect(this.output)
+		},
+		interface: [
+		{
+			type: "meter",
+			label: "db",
+			action: function(data) {
+				
+			},
+			size: {
+				w: 20,
+				h: 50
+			},
+			loc: {
+				x: 0,
+				y: 0
 			}
 		}
 	]}

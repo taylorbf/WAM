@@ -7,6 +7,6 @@
     "url": "http://github.com/taylorbf/WAM/"
   },
   "engine": "node >= 0.10.0",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "New BSD License"
 }
