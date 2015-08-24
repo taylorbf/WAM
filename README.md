@@ -1,6 +1,6 @@
 #WAM: Web Audio Modules
 
-![Demo Image](pic.png)
+![Demo Image](images/pic.png)
 <br>*A sine oscillator module connected to a delay module*
 
 **WAM** is a collection of modular computer music components –– each including an audio engine & GUI –– built by web audio community members.
@@ -8,7 +8,9 @@
 WAM is designed to assist building expressive musical instruments in the browser.
 
 
-## Assigning Context
+## Building an Instrument
+
+#### Assigning Context
 
 Given a context *ctx*:
 
@@ -16,11 +18,11 @@ Given a context *ctx*:
 WAM.setContext( ctx )
 ```
 
-## Building an Instrument
+
 
 #### Invoking Individual Modules
 
-Individual modules can be added to your project using **WAM.*moduleName*()** and connected using `.connect()`
+Individual modules can be added to your project using **WAM.*moduleName*()** and connected to each other (or to any web audio node) using `.connect()`
 
 ```js
 var mySine = WAM.sine()
@@ -33,7 +35,7 @@ By default, modules are positioned on the page relative to each other, within th
 
 #### Chaining Modules (recommended)
 
-Groups of modules can created and chained using `WAM.route()`. This way you don't need to `.connect()` every module.
+Groups of modules can be created and chained using `WAM.route()`. This way you don't need to `.connect()` every module.
 
 ```js
 var rack1 = WAM.route([
@@ -45,7 +47,7 @@ var rack1 = WAM.route([
 
 Creates the audiograph:
 
-(audiograph1 image goes here)
+![AudioGraph](images/graph1.png)
 
 More complex audiographs can be created using WAM.join()
 
@@ -57,14 +59,27 @@ var rack1 = WAM.route([
 ])
 ```
 
-Creates the audiograph:
+...creates the audiograph:
 
-(audiograph1 image goes here)
+![AudioGraph](images/graph2.png)
+
+and this...
+
+```js
+var rack1 = WAM.route([
+	WAM.join( WAM.sine(), WAM.sine(), WAM.sine() ),
+	WAM.join( WAM.delay(), WAM.delay() ),
+	WAM.out()
+])
+```
+
+...creates the audiograph:
+
+![AudioGraph](images/graph3.png)
 
 You can also connect routes together.
 
 ```js
-
 var rack1 = WAM.route([
 	WAM.join( WAM.sine(), WAM.sine(), WAM.sine() ),
 	WAM.delay()
@@ -89,7 +104,9 @@ rack2.connect(rack3)
 
 **All users are encouraged to add modules to WAM. I am accepting all pull requests of working modules.** 
 
-Modules are designed in JSON format within WAM.js. The JSON for the sine oscillator module looks like this:
+Modules are written as JS object literals within WAM.js. Each object follows the same pattern of properties and methods.
+
+The sine oscillator module looks like this:
 
 ```js
 Modules.sine = { 
@@ -113,7 +130,7 @@ Modules.sine = {
 				w: 40,
 				h: 40
 			},
-			loc: {
+			location: {
 				x: 0,
 				y: 0
 			}
@@ -128,7 +145,7 @@ Modules.sine = {
 				w: 40,
 				h: 40
 			},
-			loc: {
+			location: {
 				x: 40,
 				y: 0
 			}
@@ -138,3 +155,38 @@ Modules.sine = {
 ```
 
 ## Anatomy of a Module
+
+Each module has the following properties, which may be useful:
+
+##### this.input
+
+Gain node forming the audio input to the current module. This is connected to by other modules.
+
+##### this.output
+
+Gain node forming the audio output of the current module. This connects to ther modules.
+
+##### this.shell
+
+The &lt;div&gt; containing the module.
+
+##### this.components
+
+An array of the NexusUI interface components in this module.
+
+##### this.type
+
+The type of this module (i.e. "sine").
+
+
+## Anatomy of WAM
+
+
+##### WAM.context
+
+AudioContext, set with `WAM.setContext()`
+
+##### WAM.modules
+
+Array of modules created within the current project.
+
