@@ -1,11 +1,15 @@
 
-var Wam = function() {
+var Wam = function(Modules) {
 
 	this.context;
 	this.modules = []
 
 	nx.onload = function() {
 		nx.colorize("black")
+	}
+
+	for (var key in Modules) {
+		this[key] = this.make.bind(this,key)
 	}
 
 }
@@ -15,14 +19,60 @@ Wam.prototype.setContext = function(context) {
 	this.context = context
 }
 
-Wam.prototype.make = function(type) {
-	var module = new this.rack(type)
+Wam.prototype.out = function() {
+	return { input: this.context.destination }
+}
+
+Wam.prototype.route = function(path) {
+	for (var i=0;i<path.length;i++) {
+		if (i<path.length-1) {
+			path[i].output.connect(path[i+1].input)
+		}
+	}
+	var ports = {
+		input: path[0].input,
+		output: path[path.length-1].output
+	}
+	return ports
+}
+Wam.prototype.join = function() {
+	var args = Array.prototype.slice.call(arguments);
+	var ports = {
+		input: this.context.createGain(),
+		output: this.context.createGain()
+	}
+	for (var i=0;i<args.length;i++) {
+		ports.input.connect(args[i].input)
+		args[i].output.connect(ports.output)
+	}
+	return ports
+}
+/*
+Wam.prototype.route = function(path) {
+	for (var i=0;i<path.length;i++) {
+		if (Array.isArray(path[i])) {
+			path[i] = WAM.route(path[i])
+		}
+		if (i<path.length-1) {
+			path[i].output.connect(path[i+1].input)
+		}
+	}
+	var ports = {
+		input: path[0].input,
+		output: path[path.length-1].output
+	}
+
+	return ports
+
+} */
+Wam.prototype.make = function(type,x,y) {
+	var module = new this.rack(type,x,y)
 	this.modules.push( module )
 	return module
 
 }
 
-Wam.prototype.rack = function (type) {
+Wam.prototype.rack = function (type,x,y) {
 
 	/* create container */
 
@@ -42,6 +92,11 @@ Wam.prototype.rack = function (type) {
 	this.shell.style.fontSize = "10px"
 	this.shell.style.fontFamily = "helvetica neue"
 	this.shell.style.margin = "-1px 0px 0px -1px"
+	if (x || y || x==0 || y==0) {
+		this.shell.style.position = "absolute"
+		this.shell.style.top = y+"px"
+		this.shell.style.left = x+"px"
+	}
 
 	parent.appendChild(this.shell)
 
@@ -161,14 +216,6 @@ Wam.prototype.rack = function (type) {
 }
 
 
-var WAM = new Wam();
-
-
-/*
-	this.input
-	this.output	
- */
-
 
 Modules = {
 	"sine": { 
@@ -259,7 +306,7 @@ Modules = {
 			}
 		}
 	]}, 
-	"bt-looper": { 
+	"btLooper": { 
 		dependencies: [ "Tone" ],
 		size: {
 			w: 200,
@@ -276,6 +323,10 @@ Modules = {
 				this.components[1].init()
 				this.components[1].choices = list;
 				this.components[1].init()
+				this.player.load("./audio/"+list[0],function() {
+					this.components[2].setBuffer( this.player._buffer._buffer )
+				}.bind(this))
+				return this
 			}
 		},
 		interface: [
@@ -336,5 +387,10 @@ Modules = {
 				y: 37
 			}
 		}
-	]}, 
+	]}
 }
+
+
+
+
+var WAM = new Wam(Modules);

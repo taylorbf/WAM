@@ -12,17 +12,11 @@
 
 		WAM.setContext(Tone.context)
 
-		var sine = WAM.make("sine")
-		// WAM.sine()
-		var delay = WAM.make("delay")
-		// WAM.delay()
-
-
-
-
-		sine.output.connect(delay.input)
-		delay.output.connect(Tone.Master)
-
+		var routing = WAM.route([
+			WAM.join( WAM.sine(0,0), WAM.sine(100,0), WAM.sine(200,0)  ),
+			WAM.join( WAM.delay(0,100), WAM.delay(100,100) ),
+			WAM.out()
+		])
 
 	</script>
 </html>
