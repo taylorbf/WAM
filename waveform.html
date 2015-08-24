@@ -12,20 +12,13 @@
 
 		WAM.setContext(Tone.context)
 
-	//	var sine = WAM.make("sine")
-		var looper = WAM.make("bt-looper")
-		var delay = WAM.make("delay")
+		var looper = WAM.btLooper()
+		var delay = WAM.delay()
 
 		looper.setFiles(["symmetry"])
 
-
 		looper.output.connect(delay.input)
-		delay.output.connect(Tone.Master)
-
-		nx.onload = function() {
-
-			nx.colorize("black")
-
-		}
+		delay.output.connect( WAM.out() )
+		
 	</script>
 </html>

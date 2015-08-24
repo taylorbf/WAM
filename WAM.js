@@ -54,24 +54,6 @@ Wam.prototype.join = function() {
 	}
 	return ports
 }
-/*
-Wam.prototype.route = function(path) {
-	for (var i=0;i<path.length;i++) {
-		if (Array.isArray(path[i])) {
-			path[i] = WAM.route(path[i])
-		}
-		if (i<path.length-1) {
-			path[i].output.connect(path[i+1].input)
-		}
-	}
-	var ports = {
-		input: path[0].input,
-		output: path[path.length-1].output
-	}
-
-	return ports
-
-} */
 Wam.prototype.make = function(type,x,y) {
 	var module = new this.rack(type,x,y)
 	this.modules.push( module )
@@ -93,16 +75,17 @@ Wam.prototype.rack = function (type,x,y) {
 
 	this.shell = document.createElement("div")
 	this.shell.style.border = "solid 1px black"
+	this.shell.style.backgroundColor = "white"
 	this.shell.style.position = "relative"
-	this.shell.style.padding = "20px 5px 5px 5px"
+	this.shell.style.padding = "15px 5px 4px 5px"
 	this.shell.style.display = "inline-block"
-	this.shell.style.fontSize = "10px"
+	this.shell.style.fontSize = "9px"
 	this.shell.style.fontFamily = "helvetica neue"
 	this.shell.style.margin = "-1px 0px 0px -1px"
 	if (x || y || x==0 || y==0) {
 		this.shell.style.position = "absolute"
-		this.shell.style.top = y+"px"
-		this.shell.style.left = x+"px"
+		this.shell.style.top = y+5+"px"
+		this.shell.style.left = x+5+"px"
 	}
 
 	parent.appendChild(this.shell)
@@ -113,8 +96,16 @@ Wam.prototype.rack = function (type,x,y) {
 	title.style.top="0px"
 	title.style.left="0px"
 	title.style.width="100%"
-	title.style.backgroundColor="#eee"
-	title.style.padding="3px 0px"
+	if (module.color) {
+		title.style.backgroundColor = module.color
+		title.style.color = "#fff"
+	} else {
+		title.style.backgroundColor = "#000"
+		title.style.color = "#fff"
+	}
+	
+	title.style.letterSpacing = "1px"
+	title.style.padding="1px 0px"
 	title.style.overflow="hidden"
 	title.style.boxSizing="border-box"
 	title.style.textAlign="center"
@@ -230,11 +221,12 @@ Modules = {
 		dependencies: [ "Tone" ],
 		size: {
 			w: 80,
-			h: 52
+			h: 50
 		},
 		audio: function() {
-			this.toneosc = new Tone.Oscillator(440, "sine").start();
+			this.toneosc = new Tone.Oscillator(0, "sine").start();
 			this.toneosc.connect(this.output)
+			this.output.gain.value = 0.2
 		},
 		interface: [
 		{
@@ -270,9 +262,10 @@ Modules = {
 	]},
 	"delay": { 
 		dependencies: [ "Tone" ],
+		color: "#1bd",
 		size: {
 			w: 80,
-			h: 52
+			h: 50
 		},
 		audio: function() {
 			this.delayline = new Tone.FeedbackDelay(0.25, 0.8)
@@ -318,7 +311,7 @@ Modules = {
 		dependencies: [ "Tone" ],
 		size: {
 			w: 200,
-			h: 120
+			h: 110
 		},
 		audio: function() {
 			this.player = new Tone.Player()
@@ -340,7 +333,7 @@ Modules = {
 		interface: [
 		{
 			type: "toggle",
-			label: "on",
+			label: "",
 			action: function(data) {
 				if (data.value) {
 					this.player.start()
@@ -354,12 +347,12 @@ Modules = {
 			},
 			loc: {
 				x: 0,
-				y: 0
+				y: 1
 			}
 		},
 		{
 			type: "select",
-			label: "file",
+			label: "",
 			action: function(data) {
 				if (data.text) {
 					this.player.load("./audio/"+data.text,function() {
@@ -368,38 +361,38 @@ Modules = {
 				}
 			},
 			size: {
-				w: 174,
+				w: 178,
 				h: 20
 			},
 			loc: {
-				x: 25,
-				y: 0
+				x: 23,
+				y: 1
 			},
 			init: function() {
 			}
 		},
 		{
 			type: "waveform",
-			label: "loop",
+			label: "",
 			action: function(data) {
 				this.player.setLoopPoints(data.starttime/1000, data.stoptime/1000)
 			},
 			size: {
 				w: 200,
-				h: 70
+				h: 85
 			},
 			init: function() {
 			},
 			loc: {
 				x: 0,
-				y: 37
+				y: 25
 			}
 		}
 	]}, 
 	"meter": {
 		size: {
-			w: 20,
-			h: 52
+			w: 25,
+			h: 50
 		},
 		audio: function() {
 			this.components[0].setup(WAM.context,this.input);
@@ -417,7 +410,7 @@ Modules = {
 				h: 40
 			},
 			loc: {
-				x: 0,
+				x: 3,
 				y: 0
 			}
 		}
@@ -425,7 +418,7 @@ Modules = {
 	"enveloop": {
 		size: {
 			w: 130,
-			h: 52
+			h: 50
 		},
 		audio: function() {
 			this.input.connect(this.output)
