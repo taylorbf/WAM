@@ -5,9 +5,9 @@
 
 **WAM** is a collection of open-source modular computer music components built by the web audio community.
 
-Each module includes a web audio engine & HTML5 GUI.
+Each module includes a web audio engine & HTML5 GUI. Modules are written in js object literal notation, according to the WAM spec.
 
-WAM is designed to assist building expressive musical instruments in the browser.
+By encapsulating and sharing our common (& uncommon) computer music devices, WAM is designed to assist building expressive musical instruments in the browser.
 
 
 ## Building an Instrument
