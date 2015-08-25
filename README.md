@@ -1,7 +1,6 @@
 #WAM: Web Audio Modules
 
-![Demo Image](images/demo.png)
-<br>*A sine oscillator module connected to a delay module*
+![Demo Image](images/demo2.png)
 
 **WAM** is a collection of open-source modular computer music components built by the web audio community.
 
