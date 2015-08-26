@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<script src="js/Tone.js"></script>
+		<script src="http://cdn.tonejs.org/latest/Tone.min.js"></script>
 		<script src="js/nexusUI.js"></script>
 		<script src="WAM.js"></script>
 	</head>
@@ -15,9 +15,11 @@
 		var routing = WAM.route([
 			WAM.sine(),
 			WAM.enveloop(),
-			WAM.meter(),
+			WAM.delay(),
+			WAM.mixer4ch(),
 			WAM.out()
 		])
+
 
 	</script>
 </html>

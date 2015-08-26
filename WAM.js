@@ -6,6 +6,7 @@ var Wam = function(Modules) {
 
 	nx.onload = function() {
 		nx.colorize("black")
+		nx.colorize("fill","#e2e2e2")
 	}
 
 	for (var key in Modules) {
@@ -457,6 +458,252 @@ Modules = {
 			}
 		}
 	]},
+	"scratch": {
+		// needs custom function for loadfile
+		size: {
+			w: 100,
+			h: 100
+		},
+		audio: function() {
+			this.player = new Tone.Player()
+			this.player.loop = true
+			this.player.load("./audio/beat.mp3",function() {
+				this.player.start()
+			}.bind(this))
+			this.player.connect(this.output)
+		},
+		interface: [
+		{
+			type: "vinyl",
+			label: "",
+			action: function(data) {
+				if (data.speed) {
+					if (data.speed < 0 && !this.player.reverse) {
+						this.player.reverse = true;
+					} else if (data.speed >= 0 && this.player.reverse) {
+						this.player.reverse = false;
+					}
+					data.speed = Math.abs(data.speed)
+					this.player.playbackRate = data.speed
+				}
+			},
+			size: {
+				w: 100,
+				h: 100
+			},
+			loc: {
+				x: 0,
+				y: 0
+			}
+		}
+	]},
+	"mixer4ch": {
+		size: {
+			w: 200,
+			h: 100
+		},
+		audio: function() {
+			this.panvol1 = new Tone.PanVol(0.5, -2);
+			this.panvol2 = new Tone.PanVol(0.5, -2);
+			this.panvol3 = new Tone.PanVol(0.5, -2);
+			this.panvol4 = new Tone.PanVol(0.5, -2);
+			this.components[8].setup(WAM.context,this.panvol1.output.output);
+			this.components[9].setup(WAM.context,this.panvol2.output.output);
+			this.components[10].setup(WAM.context,this.panvol3.output.output);
+			this.components[11].setup(WAM.context,this.panvol4.output.output);
+			this.input.connect(this.panvol1)
+			this.input.connect(this.panvol2)
+			this.input.connect(this.panvol3)
+			this.input.connect(this.panvol4)
+
+			this.panvol1.connect(this.output)
+			this.panvol2.connect(this.output)
+			this.panvol3.connect(this.output)
+			this.panvol4.connect(this.output)
+		},
+		interface: [
+		{
+			type: "slider",
+			label: "1",
+			action: function(data) {
+				this.panvol1.volume.value = -50 + data.value*50
+			},
+			size: {
+				w: 20,
+				h: 90
+			},
+			loc: {
+				x: 0,
+				y: 0
+			}
+		},
+		{
+			type: "slider",
+			label: "2",
+			action: function(data) {
+				this.panvol2.volume.value = -50 + data.value*50
+			},
+			size: {
+				w: 20,
+				h: 90
+			},
+			loc: {
+				x: 50,
+				y: 0
+			}
+		},
+		{
+			type: "slider",
+			label: "3",
+			action: function(data) {
+				this.panvol3.volume.value = -50 + data.value*50
+			},
+			size: {
+				w: 20,
+				h: 90
+			},
+			loc: {
+				x: 100,
+				y: 0
+			}
+		},
+		{
+			type: "slider",
+			label: "4",
+			action: function(data) {
+				this.panvol4.volume.value = -50 + data.value*50
+			},
+			size: {
+				w: 20,
+				h: 90
+			},
+			loc: {
+				x: 150,
+				y: 0
+			}
+		},
+		{
+			type: "dial",
+			label: "pan",
+			action: function(data) {
+				this.panvol4.pan.value = data.value
+				
+			},
+			size: {
+				w: 25,
+				h: 25
+			},
+			loc: {
+				x: 23,
+				y: 0
+			}
+		},
+		{
+			type: "dial",
+			label: "pan",
+			action: function(data) {
+				
+			},
+			size: {
+				w: 25,
+				h: 25
+			},
+			loc: {
+				x: 73,
+				y: 0
+			}
+		},
+		{
+			type: "dial",
+			label: "pan",
+			action: function(data) {
+				
+			},
+			size: {
+				w: 25,
+				h: 25
+			},
+			loc: {
+				x: 123,
+				y: 0
+			}
+		},
+		{
+			type: "dial",
+			label: "pan",
+			action: function(data) {
+				
+			},
+			size: {
+				w: 25,
+				h: 25
+			},
+			loc: {
+				x: 173,
+				y: 0
+			}
+		},
+		{
+			type: "meter",
+			label: "db",
+			action: function(data) {
+				
+			},
+			size: {
+				w: 20,
+				h: 50
+			},
+			loc: {
+				x: 25,
+				y: 40
+			}
+		},
+		{
+			type: "meter",
+			label: "db",
+			action: function(data) {
+				
+			},
+			size: {
+				w: 20,
+				h: 50
+			},
+			loc: {
+				x: 75,
+				y: 40
+			}
+		},
+		{
+			type: "meter",
+			label: "db",
+			action: function(data) {
+				
+			},
+			size: {
+				w: 20,
+				h: 50
+			},
+			loc: {
+				x: 125,
+				y: 40
+			}
+		},
+		{
+			type: "meter",
+			label: "db",
+			action: function(data) {
+				
+			},
+			size: {
+				w: 20,
+				h: 50
+			},
+			loc: {
+				x: 175,
+				y: 40
+			}
+		}
+	]}
 }
 
 
