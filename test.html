@@ -12,13 +12,42 @@
 
 		WAM.setContext(Tone.context)
 
-		var routing = WAM.route([
+		var sine1 = WAM.sine()
+		var sine2 = WAM.sine()
+		var sine3 = WAM.sine()
+		var sine4 = WAM.sine()
+
+		var mixer = WAM.mixer4ch()
+
+		sine1.connect(mixer,0,0)
+		sine2.connect(mixer,0,1)
+		sine3.connect(mixer,0,2)
+		sine4.connect(mixer,0,3)
+
+		mixer.connect( WAM.out() )
+
+	/*	sine.connect(delay)
+		delay.connect(WAM.out()) */
+
+	/*	var routing = WAM.route([
 			WAM.sine(),
-			WAM.enveloop(),
-			WAM.delay(),
-			WAM.mixer4ch(),
-			WAM.out()
+			WAM.delay()
 		])
+
+	/*	var routing2 = WAM.route([
+			WAM.sine(100,0),
+			WAM.delay(100,70)
+		])
+
+		var routing3 = WAM.route([
+			WAM.mixer4ch(0,140),
+			WAM.out()
+		]) */
+
+	//	routing.connect(routing3)
+	//	routing2.connect(routing3)
+
+
 
 
 	</script>

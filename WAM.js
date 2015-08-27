@@ -122,10 +122,14 @@ Wam.prototype.rack = function (type,x,y) {
 
 	this.shell.appendChild(container)
 
-	/* create inputs & outputs */
+	/* create inputs & outputs & connect() */
 
 	this.input = WAM.context.createGain()
 	this.output = WAM.context.createGain()
+
+	this.connect = function(destination,chIn,chOut) {
+		this.output.connect(destination.input,chIn,chOut)
+	}
 
 	/* create custom module api */
 
@@ -190,26 +194,7 @@ Wam.prototype.rack = function (type,x,y) {
 
 	module.audio.bind(this)()
 
-	/*var closer = document.createElement("div")
-	closer.setAttribute("class", "closer")
-	closer.innerHTML = "x"
-//	container.appendChild(closer)
-	closer.onclick = function() {
-		if (container.className.indexOf("wall")>=0) {
-			//shelf.wall.kill()
-			//destroys widget when wall is killed, not when indiv media are killed.
-			for (var i=0;i<shelf.widgets.length;i++) {
-				shelf.widgets[i].destroy();
-			}
-			shelf.remove()
-		} else {
-		//	widget.media.kill()
-			parent.removeChild(container)
-		}
-		
-	} */
-
-	//racks.push(newrack)
+	/* return the module */
 
 	return this
 
@@ -503,6 +488,11 @@ Modules = {
 			h: 100
 		},
 		audio: function() {
+			this.input = WAM.context.createChannelMerger(4);
+			this.splitter = WAM.context.createChannelSplitter(4);
+
+			this.input.connect(this.splitter)
+	
 			this.panvol1 = new Tone.PanVol(0.5, -2);
 			this.panvol2 = new Tone.PanVol(0.5, -2);
 			this.panvol3 = new Tone.PanVol(0.5, -2);
@@ -511,15 +501,17 @@ Modules = {
 			this.components[9].setup(WAM.context,this.panvol2.output.output);
 			this.components[10].setup(WAM.context,this.panvol3.output.output);
 			this.components[11].setup(WAM.context,this.panvol4.output.output);
-			this.input.connect(this.panvol1)
-			this.input.connect(this.panvol2)
-			this.input.connect(this.panvol3)
-			this.input.connect(this.panvol4)
+			this.splitter.connect(this.panvol1,0)
+			this.splitter.connect(this.panvol2,1)
+			this.splitter.connect(this.panvol3,2)
+			this.splitter.connect(this.panvol4,3)
 
-			this.panvol1.connect(this.output)
-			this.panvol2.connect(this.output)
-			this.panvol3.connect(this.output)
-			this.panvol4.connect(this.output)
+
+			this.panvol1.output.connect(this.output)
+			this.panvol2.output.connect(this.output)
+			this.panvol3.output.connect(this.output)
+			this.panvol4.output.connect(this.output)
+
 		},
 		interface: [
 		{
@@ -586,8 +578,7 @@ Modules = {
 			type: "dial",
 			label: "pan",
 			action: function(data) {
-				this.panvol4.pan.value = data.value
-				
+				this.panvol1.pan.value = data.value
 			},
 			size: {
 				w: 25,
@@ -602,7 +593,7 @@ Modules = {
 			type: "dial",
 			label: "pan",
 			action: function(data) {
-				
+				this.panvol2.pan.value = data.value
 			},
 			size: {
 				w: 25,
@@ -617,7 +608,7 @@ Modules = {
 			type: "dial",
 			label: "pan",
 			action: function(data) {
-				
+				this.panvol3.pan.value = data.value
 			},
 			size: {
 				w: 25,
@@ -632,7 +623,7 @@ Modules = {
 			type: "dial",
 			label: "pan",
 			action: function(data) {
-				
+				this.panvol4.pan.value = data.value
 			},
 			size: {
 				w: 25,
