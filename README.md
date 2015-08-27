@@ -1,6 +1,6 @@
 #WAM: Web Audio Modules
 
-![Demo Image](images/demo2.png)
+![Demo Image](images/demo3.png)
 
 **WAM** is a collection of open-source modular computer music components built by the web audio community.
 
