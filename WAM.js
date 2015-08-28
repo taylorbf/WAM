@@ -168,10 +168,6 @@ Wam.prototype.rack = function (type,x,y) {
 
 		widget.on('*', action)
 
-		if (parts[i].initial) {
-			widget.set(parts[i].initial, true)
-		}
-
 		if (parts[i].label) {
 			var label = document.createElement("div")
 			label.innerHTML = parts[i].label
@@ -182,10 +178,6 @@ Wam.prototype.rack = function (type,x,y) {
 			col.appendChild(label)
 		}
 
-		if (parts[i].init) {
-			parts[i].init.bind(widget)();
-		}
-
 		this.components.push(widget)
 
 	}
@@ -193,6 +185,19 @@ Wam.prototype.rack = function (type,x,y) {
 	/* create audio */
 
 	module.audio.bind(this)()
+
+	/* init interface */
+
+	for (var i=0;i<parts.length;i++) {
+
+		if (parts[i].init) {
+			parts[i].init.bind(this.components[i])();
+		}
+		if (parts[i].initial) {
+			this.components[i].set(parts[i].initial, true)
+		}
+
+	}
 
 	/* return the module */
 
@@ -693,6 +698,114 @@ Modules = {
 				x: 175,
 				y: 40
 			}
+		}
+	]},
+	"FMSeq": {
+		size: {
+			w: 240,
+			h: 185
+		},
+		audio: function() {
+			this.unit = new Tone.PolySynth(4, Tone.FMSynth);
+			this.unit.connect(this.output)
+		},
+		interface: [
+		{
+			label: "volume",
+			type: "dial",
+			action: function(data) {
+				this.unit.volume.rampTo(-50+data.value*50,1);
+			},
+			initial: {
+				"value": 0.75
+			},
+			size: {
+				w: 40,
+				h: 40
+			},
+			loc: {
+				x: 0,
+				y: 0
+			}
+		},{
+			label: "harm",
+			type: "dial",
+			action: function(data) {
+				this.unit.harmonicity.value = data.value*5;
+			},
+			size: {
+				w: 40,
+				h: 40
+			},
+			loc: {
+				x: 40,
+				y: 0
+			}
+		},{
+			label: "mod",
+			type: "dial",
+			action: function(data) {
+				this.unit.modulationIndex.value = data.value*100;
+			},
+			size: {
+				w: 40,
+				h: 40
+			},
+			loc: {
+				x: 80,
+				y: 0
+			}
+		},{
+			label: "glide",
+			type: "dial",
+			action: function(data) {
+				this.unit.portamento = data.value;
+			},
+			size: {
+				w: 40,
+				h: 40
+			},
+			loc: {
+				x: 120,
+				y: 0
+			}
+		},{
+			label: "pitch",
+			type: "matrix",
+			action: function(data) {
+				var major = [0,2,4,5,7,9,11,12]
+				if (data.list) {
+					for (var i=0;i<data.list.length;i++) {
+						if (data.list[i]) {
+							var note = nx.mtof(major[i]+48)
+							this.unit.triggerAttackRelease(note,'64n')
+						}
+					}
+				}
+			},
+			size: {
+				w: 240,
+				h: 120
+			},
+			loc: {
+				x: 0,
+				y: 55
+			},
+			init: function() {
+				this.col = 16;
+				this.row = 8;
+				this.init();
+				this.sequence(240)
+				/*Tone.Transport.setTimeout(function(time){
+					this.ToneInt = Tone.Transport.setInterval(function(time){
+					    this.jumpToCol(this.place)
+					    this.place++;
+					    if (this.place>=this.col) {
+					    	this.place=0;
+					    }
+					}.bind(this), "24n");
+				}.bind(this),Tone.Transport.nextBeat('1n')) */
+			} 
 		}
 	]}
 }

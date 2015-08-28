@@ -1,0 +1,23 @@
+<html>
+	<head>
+		<script src="http://cdn.tonejs.org/latest/Tone.min.js"></script>
+		<script src="js/nexusUI.js"></script>
+		<script src="WAM.js"></script>
+	</head>
+	<body>
+
+
+	</body>
+	<script>
+
+		WAM.setContext(Tone.context)
+
+		var routing = WAM.route([
+			WAM.FMSeq(),
+			WAM.delay(),
+			WAM.mixer4ch(),
+			WAM.out()
+		])
+
+	</script>
+</html>
