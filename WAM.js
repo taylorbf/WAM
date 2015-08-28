@@ -807,7 +807,40 @@ Modules = {
 				}.bind(this),Tone.Transport.nextBeat('1n')) */
 			} 
 		}
-	]}
+	]},
+	"microphone": {
+		size: { w: 80 , h: 50 },
+		audio: function() {
+			this.unit = new Tone.Microphone()
+			this.unit.connect(this.output)
+		},
+		interface: [
+		{
+			label: "volume",
+			type: "dial",
+			action: function(data) {
+				this.unit.volume.value = -50 + data.value*50;
+			},
+			initial: {
+				value: 0.5
+			},
+			size: { w: 40 , h: 40 },
+			loc: { x: 0 , y: 0 }
+		},
+		{
+			label: "on",
+			type: "toggle",
+			action: function(data) {
+				if (data.value) {
+					this.unit.start();
+				} else {
+					this.unit.stop();
+				}
+			},
+			size: { w: 40 , h: 40 },
+			loc: { x: 40 , y: 0 }
+		}
+	]},
 }
 
 

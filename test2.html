@@ -13,7 +13,7 @@
 		WAM.setContext(Tone.context)
 
 		var routing = WAM.route([
-			WAM.FMSeq(),
+			WAM.microphone(),
 			WAM.delay(),
 			WAM.mixer4ch(),
 			WAM.out()
