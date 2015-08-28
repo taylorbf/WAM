@@ -8,6 +8,8 @@ Each module includes a web audio engine & HTML5 GUI. Modules are written in js o
 
 By encapsulating and sharing our common (& uncommon) computer music devices, WAM is designed to assist building expressive musical instruments in the browser.
 
+[**Demo**](http://taylorbf.github.io/WAM)
+
 
 ## Building an Instrument
 
