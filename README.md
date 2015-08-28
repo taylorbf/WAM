@@ -10,8 +10,32 @@ By encapsulating and sharing our common (& uncommon) computer music devices, WAM
 
 [**Demo**](http://taylorbf.github.io/WAM)
 
+## Current Modules
+
+Generators: **sine**, **FMSeq**, **microphone**, **btlooper**
+
+Effects: **delay**, **enveloop**
+
+Output/Analysis: **meter**, **mixer4ch**, **out**
+
 
 ## Building an Instrument
+
+A complete WAM instrument looks something like this:
+
+
+```js
+WAM.setContext( ctx )
+
+var rack1 = WAM.route([
+	WAM.microphone(),
+	WAM.delay(),
+	WAM.mixer4ch(),
+	WAM.out()
+])
+```
+
+The parts...
 
 #### Assigning Context
 
@@ -21,11 +45,9 @@ Tell WAM about your current audio context:
 WAM.setContext( ctx )
 ```
 
+#### Adding Modules 1-by-1 (not recommended)
 
-
-#### Adding Individual Modules
-
-Individual modules can be added to your project using **WAM.*moduleName*()** and connected to each other (or to any web audio node) using `.connect()`
+Individual modules can be added to your project using **WAM.*moduleName*()** and connected to each other (or to any web audio node) using `.connect()`.
 
 ```js
 var mySine = WAM.sine()
@@ -38,7 +60,7 @@ By default, modules are positioned on the page relative to each other, within th
 
 #### Chaining Modules (recommended)
 
-Groups of modules can be both created *and* connected using `WAM.route()`. This way you don't need to `.connect()` every module.
+Groups of modules can be created and connected simultaneously using `WAM.route()`. This way you don't need to `.connect()` every module.
 
 ```js
 var rack1 = WAM.route([
