@@ -10,7 +10,7 @@ By encapsulating and sharing our common (& uncommon) computer music devices, WAM
 
 [**Demo**](http://taylorbf.github.io/WAM)
 
-[**Video: "How to contribute a module"**](https://www.youtube.com/HTw1pRo5HtE)
+[**Video: "How to contribute a module"**](https://youtu.be/HTw1pRo5HtE)
 
 ## Current Modules
 
