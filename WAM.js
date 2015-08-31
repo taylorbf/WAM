@@ -226,6 +226,9 @@ Modules = {
 			action: function(data) {
 				this.toneosc.frequency.value = data.value * 1000
 			},
+			initial: {
+				value: 0
+			},
 			size: {
 				w: 40,
 				h: 40
@@ -239,7 +242,10 @@ Modules = {
 			type: "dial",
 			label: "vol",
 			action: function(data) {
-				this.toneosc.volume.value = -100 + data.value*100
+				this.toneosc.volume.value = -50 + data.value*60
+			},
+			initial: {
+				value: 0.75
 			},
 			size: {
 				w: 40,
@@ -841,6 +847,38 @@ Modules = {
 			loc: { x: 40 , y: 0 }
 		}
 	]},
+}
+
+
+
+Modules.clix = {
+	size: { w: 400 , h: 200 },
+	audio: function() {
+		this.noise = new Tone.Noise().start()
+		this.env = new Tone.AmplitudeEnvelope(0.01,0,1,0.01)
+		this.filter = new Tone.Filter()
+		this.reverb = new Tone.Freeverb(0.9,5000)
+		this.filter.type = "bandpass"
+		this.filter.Q.value = 600
+		this.filter.gain.value = 30
+		this.noise.connect(this.env)
+		this.env.connect(this.filter)
+		this.filter.connect(this.reverb)
+		this.reverb.connect(this.output)
+	},
+	interface: [
+	{
+		label: "",
+		type: "typewriter",
+		action: function(data) {
+			if (data.on) {
+				this.filter.frequency.value = nx.mtof(data.ascii);
+				this.env.triggerAttackRelease(0.01)
+			}
+		},
+		size: { w: 400 , h: 200 },
+		loc: { x: 0 , y: 0 }
+	}]
 }
 
 
