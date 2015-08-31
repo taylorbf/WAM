@@ -14,7 +14,7 @@ By encapsulating and sharing our common (& uncommon) computer music devices, WAM
 
 ## Current Modules
 
-Generators: **sine**, **FMSeq**, **microphone**, **btlooper**
+Generators: **sine**, **FMSeq**, **microphone**, **btlooper**, **scratch**
 
 Effects: **delay**, **enveloop**
 
@@ -27,7 +27,7 @@ A complete WAM instrument looks something like this:
 
 
 ```js
-WAM.setContext( ctx )
+WAM.setContext( Tone.context )
 
 var rack1 = WAM.route([
 	WAM.microphone(),
@@ -57,8 +57,6 @@ var myDelay = WAM.delay()
 mySine.connect(myDelay)
 myDelay.connect( WAM.out() )
 ```
-
-By default, modules are positioned on the page relative to each other, within the flow of the document. To place a module precisely on the page, specify x/y when creating the module. Example: `WAM.sine(100,200)` will create a module 100 px from the left and 200 px from the top of the document.
 
 #### Chaining Modules (recommended)
 
@@ -126,6 +124,17 @@ rack1.connect(rack3)
 rack2.connect(rack3)
 ```
 
+#### Positioning Modules on the Page
+
+By default, modules are positioned on the page relative to each other, within the flow of the document. 
+
+To place a module precisely on the page, specify x/y when creating the module. Example: 
+
+```
+WAM.sine(100,200)
+``` 
+
+... creates a sine module 100 px from the left and 200 px from the top of the document.
 
 ## Contributing Modules
 
