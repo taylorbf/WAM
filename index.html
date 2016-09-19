@@ -13,7 +13,7 @@
 		WAM.setContext(Tone.context)
 
 		var routing = WAM.route([
-			WAM.join( WAM.sine(0,0), WAM.sine(90,0), WAM.sine(180,0)  ),
+			WAM.join( WAM.sine(0,0), WAM.sine(90,0), WAM.sine(180,0) ),
 			WAM.join( WAM.delay(0,70), WAM.delay(90,70) ),
 			WAM.meter(180,70),
 			WAM.out()

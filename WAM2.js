@@ -4,15 +4,27 @@ var Wam = function(Modules) {
 	this.context;
 	this.modules = []
 
+	this.colors = {
+		body: "#090909",
+		title: "#0bc",
+		module: "#191919",
+		label: "#0bc",
+		text: "#000"
+	}
+
 	nx.onload = function() {
-		nx.colorize("black")
-		nx.colorize("fill","#e2e2e2")
+		nx.colorize("#0bc")
+		nx.colorize("fill","#292929")
 	}
 
 	for (var key in Modules) {
 		this[key] = this.make.bind(this,key)
 	}
 
+}
+
+Wam.prototype.init = function() {
+	document.body.style.backgroundColor = this.colors.body
 }
 
 
@@ -76,7 +88,8 @@ Wam.prototype.rack = function (type,x,y) {
 
 	this.shell = document.createElement("div")
 	this.shell.style.border = "solid 1px black"
-	this.shell.style.backgroundColor = "white"
+	this.shell.style.backgroundColor = WAM.colors.module
+	this.shell.style.color = WAM.colors.text
 	this.shell.style.position = "relative"
 	this.shell.style.padding = "15px 5px 4px 5px"
 	this.shell.style.display = "inline-block"
@@ -98,13 +111,13 @@ Wam.prototype.rack = function (type,x,y) {
 	title.style.left="0px"
 	title.style.width="100%"
 	if (module.color) {
-		title.style.backgroundColor = module.color
-		title.style.color = "#fff"
+		title.style.backgroundColor = WAM.colors.title
+		title.style.color = WAM.colors.text
 	} else {
-		title.style.backgroundColor = "#000"
-		title.style.color = "#fff"
+		title.style.backgroundColor = WAM.colors.title
+		title.style.color = WAM.colors.text
 	}
-	
+
 	title.style.letterSpacing = "1px"
 	title.style.padding="1px 0px"
 	title.style.overflow="hidden"
@@ -116,7 +129,7 @@ Wam.prototype.rack = function (type,x,y) {
 	var container = document.createElement("div")
 	container.style.position = "relative"
 	//container.id = rackid
-	
+
 	container.style.width = module.size.w + "px"
 	container.style.height = module.size.h + "px"
 
@@ -129,6 +142,25 @@ Wam.prototype.rack = function (type,x,y) {
 
 	this.connect = function(destination,chIn,chOut) {
 		this.output.connect(destination.input,chIn,chOut)
+	}
+
+	this.events = {}
+
+	this.emit = function(eventType,value) {
+		if (this.events[eventType]) {
+			var cbs = this.events[eventType]
+			for (var i=0;i<cbs.length;i++) {
+				cbs[i](value)
+			}
+		}
+	}
+
+	this.on = function(eventType,cb) {
+		if (eventType in this.events) {
+			this.events[eventType].push(cb)
+		} else {
+			this.events[eventType] = [ cb ]
+		}
 	}
 
 	/* create custom module api */
@@ -150,7 +182,7 @@ Wam.prototype.rack = function (type,x,y) {
 		col.style.position = "absolute"
 		col.style.left = parts[i].loc.x + "px"
 		col.style.top = parts[i].loc.y + "px"
-		
+
 		container.appendChild(col)
 
 		var widget = nx.add(parts[i].type,{
@@ -172,8 +204,9 @@ Wam.prototype.rack = function (type,x,y) {
 			var label = document.createElement("div")
 			label.innerHTML = parts[i].label
 			label.style.textAlign = "center"
-			label.style.backgroundColor = "#eee"
-			label.style.border = "solid 1px white"
+			label.style.backgroundColor = WAM.colors.label
+			label.style.color = WAM.colors.text
+			label.style.border = "solid 1px #000"
 
 			col.appendChild(label)
 		}
@@ -208,23 +241,39 @@ Wam.prototype.rack = function (type,x,y) {
 
 
 Modules = {
-	"sine": { 
-		dependencies: [ "Tone" ],
+	"sine": {
 		size: {
-			w: 80,
+			w: 200,
 			h: 50
 		},
 		audio: function() {
-			this.toneosc = new Tone.Oscillator(0, "sine").start();
+			this.toneosc = new Tone.Oscillator(0, "triangle").start();
 			this.toneosc.connect(this.output)
 			this.output.gain.value = 0.2
+			this.frequency = 0
+			this.freq = function(freq) {
+				if (freq>0) {
+					this.components[0].set({value: freq/1000}, true)
+				}
+			}
+			this.vol = function(amp) {
+				if (amp>=0) {
+					this.components[1].set({value: amp}, true)
+				}
+			}
+			this.start = function() {
+				this.toneosc.start()
+			}
+			this.stop = function() {
+				this.toneosc.pause()
+			}
 		},
 		interface: [
 		{
 			type: "dial",
 			label: "freq",
 			action: function(data) {
-				this.toneosc.frequency.value = data.value * 1000
+				this.toneosc.frequency.setValueAtTime(data.value * 1000,0)
 			},
 			initial: {
 				value: 0
@@ -257,7 +306,7 @@ Modules = {
 			}
 		}
 	]},
-	"delay": { 
+	"delay": {
 		dependencies: [ "Tone" ],
 		color: "#1bd",
 		size: {
@@ -303,8 +352,8 @@ Modules = {
 				y: 0
 			}
 		}
-	]}, 
-	"btLooper": { 
+	]},
+	"btLooper": {
 		dependencies: [ "Tone" ],
 		size: {
 			w: 200,
@@ -385,7 +434,7 @@ Modules = {
 				y: 25
 			}
 		}
-	]}, 
+	]},
 	"meter": {
 		size: {
 			w: 25,
@@ -400,7 +449,7 @@ Modules = {
 			type: "meter",
 			label: "db",
 			action: function(data) {
-				
+
 			},
 			size: {
 				w: 20,
@@ -503,7 +552,7 @@ Modules = {
 			this.splitter = WAM.context.createChannelSplitter(4);
 
 			this.input.connect(this.splitter)
-	
+
 			this.panvol1 = new Tone.PanVol(0.5, -2);
 			this.panvol2 = new Tone.PanVol(0.5, -2);
 			this.panvol3 = new Tone.PanVol(0.5, -2);
@@ -649,7 +698,7 @@ Modules = {
 			type: "meter",
 			label: "db",
 			action: function(data) {
-				
+
 			},
 			size: {
 				w: 20,
@@ -664,7 +713,7 @@ Modules = {
 			type: "meter",
 			label: "db",
 			action: function(data) {
-				
+
 			},
 			size: {
 				w: 20,
@@ -679,7 +728,7 @@ Modules = {
 			type: "meter",
 			label: "db",
 			action: function(data) {
-				
+
 			},
 			size: {
 				w: 20,
@@ -694,7 +743,7 @@ Modules = {
 			type: "meter",
 			label: "db",
 			action: function(data) {
-				
+
 			},
 			size: {
 				w: 20,
@@ -811,7 +860,7 @@ Modules = {
 					    }
 					}.bind(this), "24n");
 				}.bind(this),Tone.Transport.nextBeat('1n')) */
-			} 
+			}
 		}
 	]},
 	"microphone": {
@@ -920,43 +969,109 @@ Modules.clix = {
 }
 
 Modules.metro = {
-	size: { w: 200 , h: 50 },
+	size: { w: 200 , h: 25 },
 	audio: function() {
-		this.event = mt.interval(100,function() {
+		this.range = [ 100, 100 ]
+		this.pulse = mt.interval(100)
+		this.pulse.stop()
+		this.pulse.event = function() {
+			this.pulse.ms( mt.random(this.range[0],this.range[1]) )
 			this.emit('bang',1)
-		}.bind(this))
-
-		this.queue = []
-		this.beat = 0;
-		this.gains = [1.0, 0.2, 0.3, 0.2, 0.4, 0.1, 0.2, 0.1,
-					  0.5, 0.1, 0.3, 0.2, 0.4, 0.1, 0.2, 0.1,
-					  0.8, 0.1, 0.3, 0.2, 0.5, 0.1, 0.2, 0.1,
-					  0.4, 0.1, 0.3, 0.2, 0.3, 0.1, 0.2, 0.1 ]
-
-		
+			this.components[1].set({press: !this.components[1].val.press})
+		}.bind(this)
 	},
 	interface: [
 	{
-		label: "",
-		type: "typewriter",
+		type: "toggle",
 		action: function(data) {
-			console.log(data)
-			if (data.key=="shift") {
-				if (data.on) {
-					this.shift = true;
-				} else {
-
-					this.shift = false;
-				}
-			}
-			if (data.on) {
-				var octave = this.shift ? 12 : 24;
-				this.queue.push(data.ascii + octave);
+			if (data.value) {
+				this.pulse.start()
+				this.emit('on',1)
+			} else {
+				this.pulse.stop()
+				this.components[1].set({press: 0})
+				this.emit('off',1)
 			}
 		},
-		size: { w: 375 , h: 150 },
+		size: { w: 25 , h: 25 },
 		loc: { x: 0 , y: 0 }
-	}]
+	},
+	{
+		type: "button",
+		action: function(data) {
+		},
+		size: { w: 25 , h: 25 },
+		loc: { x: 30 , y: 0 }
+	},
+	{
+		type: "range",
+		action: function(data) {
+			this.range = [data.start*10000,data.stop*10000]
+		},
+		size: { w: 100 , h: 20 },
+		loc: { x: 60 , y: 3 }
+	},
+
+	/*{
+		type: "number",
+		action: function(data) {
+		},
+		size: { w: 50 , h: 20 },
+		loc: { x: 60 , y: 3 }
+	},
+	{
+		type: "number",
+		action: function(data) {
+		},
+		size: { w: 50 , h: 20 },
+		loc: { x: 115 , y: 3 }
+	} */
+	]
+}
+
+
+Modules.pitchmatrix = {
+	size: { w: 200 , h: 120 },
+	audio: function() {
+		//	this.emit('bang',1)
+		//	this.components[1].set({press: !this.components[1].val.press})
+		this.activeNotes = []
+		this.major = [0,2,4,5,7,9,11,12]
+		this.dump = function() {
+			this.emit('dump',this.activeNotes)
+		}
+	},
+	interface: [
+		{
+			type: "matrix",
+			action: function(data) {
+				var degree = data.col
+				var octave = data.row
+				var freq = mt.mtof(this.major[degree]+octave*12+24)
+				if (data.level) {
+					this.activeNotes.push(freq)
+				} else {
+					var noteIndex = this.activeNotes.indexOf(freq)
+					this.activeNotes.splice(noteIndex,1)
+				}
+			},
+			size: { w: 200, h: 120 },
+			loc: { x: 0, y: 0 },
+			init: function() {
+				this.col = 8;
+				this.row = 5;
+				this.init()
+			}
+		}
+	],
+	api: {
+		dump: function() {
+			this.emit('dump',this.activeNotes)
+		},
+		pick: function() {
+
+		}
+	}
 }
 
 

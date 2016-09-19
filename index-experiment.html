@@ -1,0 +1,53 @@
+<html>
+	<head>
+		<script src="js/Tone.js"></script>
+		<script src="js/nexusUI.js"></script>
+		<script src="js/bt.js"></script>
+		<script src="WAM2.js"></script>
+		<link href="style.css" rel="stylesheet">
+	</head>
+	<body>
+
+
+	</body>
+	<script>
+
+		WAM.init()
+		WAM.setContext(Tone.context)
+		// WAM.putIn("instrument")
+
+		synth1 = {
+			metro: WAM.metro(0,0),
+			scale: WAM.pitchmatrix(0,45),
+			osc: WAM.sine(0,185)
+		}
+
+		synth1.metro.on('bang',function(value) {
+			synth1.scale.dump()
+		})
+
+		synth1.scale.on('dump',function(value) {
+			var note = mt.pick(value)
+			synth1.osc.freq(note)
+		})
+
+		synth1.metro.on('on',function(value) {
+			synth1.osc.start()
+		})
+		synth1.metro.on('off',function(value) {
+			synth1.osc.stop()
+		})
+
+
+
+		/*	audio graph */
+
+		var graph = WAM.route([
+			synth1.osc,
+			WAM.out()
+		])
+
+
+
+	</script>
+</html>
