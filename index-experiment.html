@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<script src="js/Tone.js"></script>
+		<script src="js/Tone-7.js"></script>
 		<script src="js/nexusUI.js"></script>
 		<script src="js/bt.js"></script>
 		<script src="WAM2.js"></script>
@@ -19,16 +19,37 @@
 		synth1 = {
 			metro: WAM.metro(0,0),
 			scale: WAM.pitchmatrix(0,45),
-			osc: WAM.sine(0,185)
+			osc: WAM.sine(0,185),
+			env: WAM.envelope(0,255),
+		}
+
+		fx = {
+			delay: WAM.delay(200,0)
 		}
 
 		synth1.metro.on('bang',function(value) {
+			synth1.env.duration = synth1.metro.duration
+			synth1.env.components[0].set({ points: [
+				{
+					x: 0,
+					y: 0
+				},
+					{
+						x: mt.clip(synth1.env.points[1].x + mt.rf(-0.2,0.2),0.01,0.99),
+						y: 1
+					},
+						{
+							x: 1,
+							y: 0
+						}
+			]}, true)
 			synth1.scale.dump()
 		})
 
 		synth1.scale.on('dump',function(value) {
 			var note = mt.pick(value)
 			synth1.osc.freq(note)
+			synth1.env.start()
 		})
 
 		synth1.metro.on('on',function(value) {
@@ -44,6 +65,8 @@
 
 		var graph = WAM.route([
 			synth1.osc,
+			synth1.env,
+			fx.delay,
 			WAM.out()
 		])
 

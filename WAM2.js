@@ -265,7 +265,7 @@ Modules = {
 				this.toneosc.start()
 			}
 			this.stop = function() {
-				this.toneosc.pause()
+				this.toneosc.stop()
 			}
 		},
 		interface: [
@@ -339,7 +339,7 @@ Modules = {
 			type: "dial",
 			label: "time",
 			action: function(data) {
-				this.delayline.delayTime.value = data.value + 0.01
+				this.delayline.delayTime.value = data.value*5 + 0.01
 			},
 			size: {
 				w: 40,
@@ -972,10 +972,12 @@ Modules.metro = {
 	size: { w: 200 , h: 25 },
 	audio: function() {
 		this.range = [ 100, 100 ]
-		this.pulse = mt.interval(100)
+		this.duration = 100
+		this.pulse = mt.interval(this.duration)
 		this.pulse.stop()
 		this.pulse.event = function() {
-			this.pulse.ms( mt.random(this.range[0],this.range[1]) )
+			this.duration = mt.random(this.range[0],this.range[1])
+			this.pulse.ms( this.duration )
 			this.emit('bang',1)
 			this.components[1].set({press: !this.components[1].val.press})
 		}.bind(this)
@@ -1036,7 +1038,8 @@ Modules.pitchmatrix = {
 		//	this.emit('bang',1)
 		//	this.components[1].set({press: !this.components[1].val.press})
 		this.activeNotes = []
-		this.major = [0,2,4,5,7,9,11,12]
+		//this.major = [0,2,4,5,7,9,11,12]
+		this.major = [1/1,9/8,5/4,4/3,3/2,5/3,15/8]
 		this.dump = function() {
 			this.emit('dump',this.activeNotes)
 		}
@@ -1047,7 +1050,9 @@ Modules.pitchmatrix = {
 			action: function(data) {
 				var degree = data.col
 				var octave = data.row
-				var freq = mt.mtof(this.major[degree]+octave*12+24)
+				//var freq = mt.mtof(this.major[degree]+octave*12+24)
+				var fundamental = 100
+				var freq = mt.octave(octave) * this.major[degree] * fundamental
 				if (data.level) {
 					this.activeNotes.push(freq)
 				} else {
@@ -1058,7 +1063,7 @@ Modules.pitchmatrix = {
 			size: { w: 200, h: 120 },
 			loc: { x: 0, y: 0 },
 			init: function() {
-				this.col = 8;
+				this.col = 7;
 				this.row = 5;
 				this.init()
 			}
@@ -1074,7 +1079,112 @@ Modules.pitchmatrix = {
 	}
 }
 
+Modules.envelope = {
+	size: {
+		w: 200,
+		h: 100
+	},
+	audio: function() {
+		//an amplitude envelope
+		this.start = function() {
+			this.env.triggerAttack()
+			this.env.triggerRelease("+"+(this.env.attack+0.001))
+		}
+		this.env = new Tone.Envelope({
+			"attack" : 0.2,
+			"decay" : 0,
+			"sustain" : 1,
+			"release" : 12,
+		});
+		this.env.connect(this.input.gain);
+		this.input.connect(this.output)
+		this.duration = 1000
+		this.points;
+		this.components[0].set({
+			points: [
+				{
+					x: 0,
+					y: 0
+				},
+				{
+					x: 0.5,
+					y: 1
+				},
+				{
+					x: 1,
+					y: 0
+				}
+			]
+		}, true)
+	},
+	interface: [
+		{
+			type: "envelope",
+			label: "volume",
+			action: function(data) {
+			//	this.input.gain.value = data.amp
+			//	console.log(data)
+				this.points = data.points
+				this.env.attack = ( data.points[1].x - data.points[0].x ) * this.duration/1000
+				this.env.release = ( data.points[2].x - data.points[1].x ) * this.duration/100
+			//	console.log("attack",this.env.attack)
+			//	console.log("release",this.env.release)
+			},
+			size: {
+				w: 150,
+				h: 85
+			},
+			loc: {
+				x: 0,
+				y: 0
+			}
+		},
+		{
+			type: "dial",
+			label: "dur",
+			action: function(data) {
+				this.duration = data.value * 3000 + 10
+			},
+			size: {
+				w: 35,
+				h: 35
+			},
+			loc: {
+				x: 160,
+				y: 0
+			}
+		},
+		{
+			type: "button",
+			label: "start",
+			action: function(data) {
+				console.log(data)
+				if (data.press) {
+				//	this.env.triggerAttackRelease(0.000001)
+				//	this.env.triggerAttack(0.000001)
+					this.start()
+				}
+			//	setInterval(console.log.bind(null,this.input.gain.value),100)
+			// this.components[0].duration = data.value * 3000 + 10
+			//	if (data.value)
+			//		this.components[0].start()
+			//	for (var i=0;i<this.points.length;i++) {
+			//		var point = this.points[i]
+			//		this.input.volume.rampTo(point.y*100-100,point.x*this.duration)
+			//	}
 
+			},
+			size: {
+				w: 35,
+				h: 35
+			},
+			loc: {
+				x: 160,
+				y: 50
+			}
+		}
+	]
+}
 
 
 var WAM = new Wam(Modules);
