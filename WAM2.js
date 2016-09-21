@@ -15,6 +15,7 @@ var Wam = function(Modules) {
 	nx.onload = function() {
 		nx.colorize("#0bc")
 		nx.colorize("fill","#292929")
+		nx.colorize("black","#fff")
 	}
 
 	for (var key in Modules) {
@@ -1052,11 +1053,12 @@ Modules.pitchmatrix = {
 				var octave = data.row
 				//var freq = mt.mtof(this.major[degree]+octave*12+24)
 				var fundamental = 100
-				var freq = mt.octave(octave) * this.major[degree] * fundamental
+				//var freq = mt.octave(octave) * this.major[degree] * fundamental
+				var ratio = mt.octave(octave) * this.major[degree] * 0.25
 				if (data.level) {
-					this.activeNotes.push(freq)
+					this.activeNotes.push(ratio)
 				} else {
-					var noteIndex = this.activeNotes.indexOf(freq)
+					var noteIndex = this.activeNotes.indexOf(ratio)
 					this.activeNotes.splice(noteIndex,1)
 				}
 			},
@@ -1185,6 +1187,97 @@ Modules.envelope = {
 		}
 	]
 }
+
+Modules.waveplayer = {
+	size: {
+		w: 200,
+		h: 110
+	},
+	audio: function() {
+		this.player = new Tone.Player()
+		this.player.loop = true
+		this.player.connect(this.output)
+	},
+	custom: {
+		"setFiles": function(list) {
+			this.components[1].choices = [];
+			this.components[1].init()
+			this.components[1].choices = list;
+			this.components[1].init()
+			this.player.load("./audio/"+list[0],function() {
+				this.components[2].setBuffer( this.player._buffer._buffer )
+			}.bind(this))
+			return this
+		},
+		"rate": function(rate) {
+			this.player.playbackRate = rate
+		},
+		start: function() {
+			this.player.start()
+		},
+		stop: function() {
+			this.player.stop()
+		}
+	},
+	interface: [
+	{
+		type: "toggle",
+		label: "",
+		action: function(data) {
+			if (data.value) {
+				this.player.start()
+			} else {
+				this.player.stop()
+			}
+		},
+		size: {
+			w: 20,
+			h: 20
+		},
+		loc: {
+			x: 0,
+			y: 1
+		}
+	},
+	{
+		type: "select",
+		label: "",
+		action: function(data) {
+			if (data.text) {
+				this.player.load("./audio/"+data.text,function() {
+					this.components[2].setBuffer( this.player._buffer._buffer )
+				}.bind(this))
+			}
+		},
+		size: {
+			w: 178,
+			h: 20
+		},
+		loc: {
+			x: 23,
+			y: 1
+		},
+		init: function() {
+		}
+	},
+	{
+		type: "waveform",
+		label: "",
+		action: function(data) {
+			this.player.setLoopPoints(data.starttime/1000, data.stoptime/1000)
+		},
+		size: {
+			w: 200,
+			h: 85
+		},
+		init: function() {
+		},
+		loc: {
+			x: 0,
+			y: 25
+		}
+	}
+]}
 
 
 var WAM = new Wam(Modules);

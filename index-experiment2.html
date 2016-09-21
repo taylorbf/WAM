@@ -49,15 +49,15 @@
 
 		synth1.scale.on('dump',function(value) {
 			var note = mt.pick(value)
-			synth1.osc.freq(note)
+			synth1.wave.rate(note)
 			synth1.env.start()
 		})
 
 		synth1.metro.on('on',function(value) {
-			synth1.osc.start()
+			synth1.wave.start()
 		})
 		synth1.metro.on('off',function(value) {
-			synth1.osc.stop()
+			synth1.wave.stop()
 		})
 
 
@@ -68,14 +68,8 @@
 		/*	audio graph */
 
 		var graph = WAM.route([
-			synth1.osc,
-			synth1.env,
-			fx.delay,
-			WAM.out()
-		])
-
-		var graph2 = WAM.route([
 			synth1.wave,
+			synth1.env,
 			fx.delay,
 			WAM.out()
 		])
